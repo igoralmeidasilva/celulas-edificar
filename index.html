@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Células - Rede 6 (Radicais Livres)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Células Interativas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,7 +14,7 @@
       color: #006400;
     }
     .bairro {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       background-color: #e0ffe0;
       padding: 15px;
       border-radius: 10px;
@@ -23,42 +23,151 @@
       margin-bottom: 10px;
       padding-left: 10px;
     }
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    select {
+      padding: 5px;
+      margin-right: 20px;
+      font-size: 1rem;
+    }
+    #celulas-container {
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
-  <h1>Células - Rede 6 (Radicais Livres)</h1>
 
-  <div class="bairro">
-    <h2>📍 Bairro Jardim das Palmeiras</h2>
-    <div class="celula">
-      <strong>Célula Beloved Children</strong><br>
-      🕒 Quarta-feira - 19:30<br>
-      📍 Rua do Garçom, 907
-    </div>
+  <h1>Células Interativas</h1>
+
+  <div>
+    <label for="rede-select">Escolha a Rede:</label>
+    <select id="rede-select">
+      <option value="rede6">Rede 6 (Radicais Livres)</option>
+      <option value="rede1">Rede 1 (Exemplo)</option>
+      <!-- Você pode adicionar mais redes aqui -->
+    </select>
+
+    <label for="dia-select">Escolha o Dia da Semana:</label>
+    <select id="dia-select">
+      <option value="quarta-feira">Quarta-feira</option>
+      <option value="quinta-feira">Quinta-feira</option>
+      <option value="sexta-feira">Sexta-feira</option>
+      <!-- Adicione mais dias conforme necessário -->
+    </select>
   </div>
 
-  <div class="bairro">
-    <h2>📍 Bairro Jardim Holanda</h2>
-    <div class="celula">
-      <strong>Célula United</strong><br>
-      🕒 Quarta-feira - 19:30<br>
-      📍 Rua Alameda José Salvador Silva, 595
-    </div>
-    <div class="celula">
-      <strong>Célula Girls Connected</strong><br>
-      🕒 Quarta-feira - 19:30<br>
-      📍 Rua Alameda Emiliano Borges Silva, 201
-    </div>
-  </div>
+  <div id="celulas-container"></div>
 
-  <div class="bairro">
-    <h2>📍 Bairro Segismundo Pereira</h2>
-    <div class="celula">
-      <strong>Célula Ágape</strong><br>
-      🕒 Quinta-feira - 19:30<br>
-      📍 Rua Domingo de Freitas, 1228
-    </div>
-  </div>
+  <script>
+    // Dados das células organizados por rede e dia
+    const dadosCelulas = {
+      rede6: {
+        "quarta-feira": [
+          {
+            bairro: "Jardim das Palmeiras",
+            nome: "Célula Beloved Children",
+            endereco: "Rua do Garçom, 907",
+            horario: "19:30"
+          },
+          {
+            bairro: "Jardim Holanda",
+            nome: "Célula United",
+            endereco: "Rua Alameda José Salvador Silva, 595",
+            horario: "19:30"
+          },
+          {
+            bairro: "Jardim Holanda",
+            nome: "Célula Girls Connected",
+            endereco: "Rua Alameda Emiliano Borges Silva, 201",
+            horario: "19:30"
+          }
+        ],
+        "quinta-feira": [
+          {
+            bairro: "Segismundo Pereira",
+            nome: "Célula Ágape",
+            endereco: "Rua Domingo de Freitas, 1228",
+            horario: "19:30"
+          }
+        ]
+      },
+      rede1: {
+        "quarta-feira": [
+          {
+            bairro: "Centro",
+            nome: "Célula Exemplo 1",
+            endereco: "Rua Central, 123",
+            horario: "20:00"
+          }
+        ],
+        "sexta-feira": [
+          {
+            bairro: "Vila Nova",
+            nome: "Célula Exemplo 2",
+            endereco: "Rua das Flores, 456",
+            horario: "18:30"
+          }
+        ]
+      }
+    };
+
+    // Referências aos selects e container
+    const redeSelect = document.getElementById('rede-select');
+    const diaSelect = document.getElementById('dia-select');
+    const celulasContainer = document.getElementById('celulas-container');
+
+    // Função para atualizar as células mostradas
+    function atualizarCelulas() {
+      const rede = redeSelect.value;
+      const dia = diaSelect.value;
+
+      celulasContainer.innerHTML = ''; // limpa
+
+      const celulas = dadosCelulas[rede]?.[dia] || [];
+
+      if (celulas.length === 0) {
+        celulasContainer.innerHTML = '<p>Nenhuma célula encontrada para essa seleção.</p>';
+        return;
+      }
+
+      // Agrupar por bairro
+      const bairros = {};
+      celulas.forEach(celula => {
+        if (!bairros[celula.bairro]) {
+          bairros[celula.bairro] = [];
+        }
+        bairros[celula.bairro].push(celula);
+      });
+
+      // Criar HTML das células
+      for (const bairro in bairros) {
+        const divBairro = document.createElement('div');
+        divBairro.className = 'bairro';
+
+        const h2 = document.createElement('h2');
+        h2.textContent = `📍 Bairro ${bairro}`;
+        divBairro.appendChild(h2);
+
+        bairros[bairro].forEach(celula => {
+          const divCelula = document.createElement('div');
+          divCelula.className = 'celula';
+          divCelula.innerHTML = `<strong>${celula.nome}</strong><br>🕒 ${dia} - ${celula.horario}<br>📍 ${celula.endereco}`;
+          divBairro.appendChild(divCelula);
+        });
+
+        celulasContainer.appendChild(divBairro);
+      }
+    }
+
+    // Eventos para atualizar ao mudar selects
+    redeSelect.addEventListener('change', atualizarCelulas);
+    diaSelect.addEventListener('change', atualizarCelulas);
+
+    // Inicializa com as opções padrão
+    atualizarCelulas();
+  </script>
 
 </body>
 </html>
