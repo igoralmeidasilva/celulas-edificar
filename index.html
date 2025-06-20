@@ -2,13 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Células Interativas</title>
+  <title>Células com Botões Flutuantes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       background-color: #f4f4f4;
+      margin-bottom: 120px; /* espaço para botões flutuantes */
     }
     h1, h2 {
       color: #006400;
@@ -23,45 +24,92 @@
       margin-bottom: 10px;
       padding-left: 10px;
     }
-    label {
+
+    /* Botões flutuantes */
+    .botao-flutuante-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 1000;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .grupo-botoes {
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: 300px;
+    }
+
+    .grupo-botoes span {
       font-weight: bold;
-      margin-right: 10px;
+      margin-right: 8px;
+      white-space: nowrap;
+      align-self: center;
     }
-    select {
-      padding: 5px;
-      margin-right: 20px;
-      font-size: 1rem;
+
+    .botao-flutuante {
+      padding: 6px 12px;
+      border: none;
+      background-color: #006400;
+      color: white;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      flex-shrink: 0;
     }
-    #celulas-container {
-      margin-top: 30px;
+    .botao-flutuante:hover {
+      background-color: #004d00;
+    }
+    .botao-flutuante.selecionado {
+      background-color: #00a000;
+      font-weight: bold;
+    }
+
+    /* Responsivo */
+    @media(max-width: 480px) {
+      .botao-flutuante-container {
+        right: 10px;
+        bottom: 10px;
+        max-width: 90vw;
+      }
+      .grupo-botoes {
+        max-width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>Células Interativas</h1>
-
-  <div>
-    <label for="rede-select">Escolha a Rede:</label>
-    <select id="rede-select">
-      <option value="rede6">Rede 6 (Radicais Livres)</option>
-      <option value="rede1">Rede 1 (Exemplo)</option>
-      <!-- Você pode adicionar mais redes aqui -->
-    </select>
-
-    <label for="dia-select">Escolha o Dia da Semana:</label>
-    <select id="dia-select">
-      <option value="quarta-feira">Quarta-feira</option>
-      <option value="quinta-feira">Quinta-feira</option>
-      <option value="sexta-feira">Sexta-feira</option>
-      <!-- Adicione mais dias conforme necessário -->
-    </select>
-  </div>
+  <h1>Células com Botões Flutuantes</h1>
 
   <div id="celulas-container"></div>
 
+  <!-- Botões flutuantes -->
+  <div class="botao-flutuante-container">
+
+    <div class="grupo-botoes" id="grupo-redes">
+      <span>Rede:</span>
+      <!-- botoes rede gerados via JS -->
+    </div>
+
+    <div class="grupo-botoes" id="grupo-dias">
+      <span>Dia:</span>
+      <!-- botoes dia gerados via JS -->
+    </div>
+
+  </div>
+
   <script>
-    // Dados das células organizados por rede e dia
     const dadosCelulas = {
       rede6: {
         "quarta-feira": [
@@ -113,19 +161,75 @@
       }
     };
 
-    // Referências aos selects e container
-    const redeSelect = document.getElementById('rede-select');
-    const diaSelect = document.getElementById('dia-select');
+    const redes = Object.keys(dadosCelulas);
+    // coletar todos os dias disponíveis em todas as redes para mostrar os botões
+    const diasSet = new Set();
+    for (const rede of redes) {
+      Object.keys(dadosCelulas[rede]).forEach(dia => diasSet.add(dia));
+    }
+    const dias = Array.from(diasSet).sort();
+
+    let redeSelecionada = redes[0];
+    let diaSelecionado = dias[0];
+
+    const grupoRedes = document.getElementById('grupo-redes');
+    const grupoDias = document.getElementById('grupo-dias');
     const celulasContainer = document.getElementById('celulas-container');
 
-    // Função para atualizar as células mostradas
+    // Função para criar botões e colocar no container
+    function criarBotoes(opcoes, container, tipo) {
+      opcoes.forEach(opcao => {
+        const btn = document.createElement('button');
+        btn.className = 'botao-flutuante';
+        btn.textContent = (tipo === 'rede') ? formatarRede(opcao) : formatarDia(opcao);
+        btn.dataset.valor = opcao;
+
+        btn.addEventListener('click', () => {
+          if (tipo === 'rede') {
+            redeSelecionada = opcao;
+            atualizarSelecionados('rede');
+          } else {
+            diaSelecionado = opcao;
+            atualizarSelecionados('dia');
+          }
+          atualizarCelulas();
+        });
+
+        container.appendChild(btn);
+      });
+    }
+
+    function formatarRede(chave) {
+      // Exemplo simples de nome
+      if (chave === 'rede6') return 'Rede 6 (Radicais Livres)';
+      if (chave === 'rede1') return 'Rede 1 (Exemplo)';
+      return chave;
+    }
+
+    function formatarDia(dia) {
+      // Deixa o dia com a primeira letra maiúscula
+      return dia.charAt(0).toUpperCase() + dia.slice(1);
+    }
+
+    // Atualiza visual dos botões selecionados
+    function atualizarSelecionados(tipo) {
+      const container = tipo === 'rede' ? grupoRedes : grupoDias;
+      const botoes = container.querySelectorAll('button.botao-flutuante');
+
+      botoes.forEach(btn => {
+        if ((tipo === 'rede' && btn.dataset.valor === redeSelecionada) ||
+            (tipo === 'dia' && btn.dataset.valor === diaSelecionado)) {
+          btn.classList.add('selecionado');
+        } else {
+          btn.classList.remove('selecionado');
+        }
+      });
+    }
+
+    // Atualiza a lista de células exibida
     function atualizarCelulas() {
-      const rede = redeSelect.value;
-      const dia = diaSelect.value;
-
-      celulasContainer.innerHTML = ''; // limpa
-
-      const celulas = dadosCelulas[rede]?.[dia] || [];
+      celulasContainer.innerHTML = '';
+      const celulas = dadosCelulas[redeSelecionada]?.[diaSelecionado] || [];
 
       if (celulas.length === 0) {
         celulasContainer.innerHTML = '<p>Nenhuma célula encontrada para essa seleção.</p>';
@@ -135,13 +239,10 @@
       // Agrupar por bairro
       const bairros = {};
       celulas.forEach(celula => {
-        if (!bairros[celula.bairro]) {
-          bairros[celula.bairro] = [];
-        }
+        if (!bairros[celula.bairro]) bairros[celula.bairro] = [];
         bairros[celula.bairro].push(celula);
       });
 
-      // Criar HTML das células
       for (const bairro in bairros) {
         const divBairro = document.createElement('div');
         divBairro.className = 'bairro';
@@ -153,7 +254,7 @@
         bairros[bairro].forEach(celula => {
           const divCelula = document.createElement('div');
           divCelula.className = 'celula';
-          divCelula.innerHTML = `<strong>${celula.nome}</strong><br>🕒 ${dia} - ${celula.horario}<br>📍 ${celula.endereco}`;
+          divCelula.innerHTML = `<strong>${celula.nome}</strong><br>🕒 ${diaSelecionado} - ${celula.horario}<br>📍 ${celula.endereco}`;
           divBairro.appendChild(divCelula);
         });
 
@@ -161,12 +262,15 @@
       }
     }
 
-    // Eventos para atualizar ao mudar selects
-    redeSelect.addEventListener('change', atualizarCelulas);
-    diaSelect.addEventListener('change', atualizarCelulas);
+    // Criar os botões na página
+    criarBotoes(redes, grupoRedes, 'rede');
+    criarBotoes(dias, grupoDias, 'dia');
 
-    // Inicializa com as opções padrão
+    // Selecionar os padrões visualmente e mostrar dados
+    atualizarSelecionados('rede');
+    atualizarSelecionados('dia');
     atualizarCelulas();
+
   </script>
 
 </body>
