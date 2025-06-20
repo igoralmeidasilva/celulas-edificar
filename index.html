@@ -2,30 +2,31 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Células com Botões Flutuantes</title>
+  <title>Células - Igreja</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background-color: #f4f4f4;
-      margin-bottom: 120px; /* espaço para botões flutuantes */
+      background-color: #ffffff;
+      margin-bottom: 120px;
+      color: #000000;
     }
     h1, h2 {
-      color: #006400;
+      color: #b30000;
     }
     .bairro {
       margin-bottom: 20px;
-      background-color: #e0ffe0;
+      background-color: #fff0f0;
       padding: 15px;
       border-radius: 10px;
+      border-left: 5px solid #b30000;
     }
     .celula {
       margin-bottom: 10px;
       padding-left: 10px;
     }
 
-    /* Botões flutuantes */
     .botao-flutuante-container {
       position: fixed;
       bottom: 20px;
@@ -39,7 +40,7 @@
     }
 
     .grupo-botoes {
-      background: #fff;
+      background: #ffffff;
       border-radius: 10px;
       padding: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
@@ -47,6 +48,7 @@
       gap: 8px;
       flex-wrap: wrap;
       max-width: 300px;
+      border: 1px solid #b30000;
     }
 
     .grupo-botoes span {
@@ -54,12 +56,13 @@
       margin-right: 8px;
       white-space: nowrap;
       align-self: center;
+      color: #b30000;
     }
 
     .botao-flutuante {
       padding: 6px 12px;
-      border: none;
-      background-color: #006400;
+      border: 1px solid #b30000;
+      background-color: #b30000;
       color: white;
       border-radius: 20px;
       cursor: pointer;
@@ -67,14 +70,13 @@
       flex-shrink: 0;
     }
     .botao-flutuante:hover {
-      background-color: #004d00;
+      background-color: #800000;
     }
     .botao-flutuante.selecionado {
-      background-color: #00a000;
+      background-color: #ff3333;
       font-weight: bold;
     }
 
-    /* Responsivo */
     @media(max-width: 480px) {
       .botao-flutuante-container {
         right: 10px;
@@ -90,23 +92,17 @@
 </head>
 <body>
 
-  <h1>Células com Botões Flutuantes</h1>
+  <h1>Células da Igreja</h1>
 
   <div id="celulas-container"></div>
 
-  <!-- Botões flutuantes -->
   <div class="botao-flutuante-container">
-
     <div class="grupo-botoes" id="grupo-redes">
       <span>Rede:</span>
-      <!-- botoes rede gerados via JS -->
     </div>
-
     <div class="grupo-botoes" id="grupo-dias">
       <span>Dia:</span>
-      <!-- botoes dia gerados via JS -->
     </div>
-
   </div>
 
   <script>
@@ -140,29 +136,10 @@
             horario: "19:30"
           }
         ]
-      },
-      rede1: {
-        "quarta-feira": [
-          {
-            bairro: "Centro",
-            nome: "Célula Exemplo 1",
-            endereco: "Rua Central, 123",
-            horario: "20:00"
-          }
-        ],
-        "sexta-feira": [
-          {
-            bairro: "Vila Nova",
-            nome: "Célula Exemplo 2",
-            endereco: "Rua das Flores, 456",
-            horario: "18:30"
-          }
-        ]
       }
     };
 
     const redes = Object.keys(dadosCelulas);
-    // coletar todos os dias disponíveis em todas as redes para mostrar os botões
     const diasSet = new Set();
     for (const rede of redes) {
       Object.keys(dadosCelulas[rede]).forEach(dia => diasSet.add(dia));
@@ -176,7 +153,6 @@
     const grupoDias = document.getElementById('grupo-dias');
     const celulasContainer = document.getElementById('celulas-container');
 
-    // Função para criar botões e colocar no container
     function criarBotoes(opcoes, container, tipo) {
       opcoes.forEach(opcao => {
         const btn = document.createElement('button');
@@ -200,18 +176,14 @@
     }
 
     function formatarRede(chave) {
-      // Exemplo simples de nome
       if (chave === 'rede6') return 'Rede 6 (Radicais Livres)';
-      if (chave === 'rede1') return 'Rede 1 (Exemplo)';
       return chave;
     }
 
     function formatarDia(dia) {
-      // Deixa o dia com a primeira letra maiúscula
       return dia.charAt(0).toUpperCase() + dia.slice(1);
     }
 
-    // Atualiza visual dos botões selecionados
     function atualizarSelecionados(tipo) {
       const container = tipo === 'rede' ? grupoRedes : grupoDias;
       const botoes = container.querySelectorAll('button.botao-flutuante');
@@ -226,7 +198,6 @@
       });
     }
 
-    // Atualiza a lista de células exibida
     function atualizarCelulas() {
       celulasContainer.innerHTML = '';
       const celulas = dadosCelulas[redeSelecionada]?.[diaSelecionado] || [];
@@ -236,7 +207,6 @@
         return;
       }
 
-      // Agrupar por bairro
       const bairros = {};
       celulas.forEach(celula => {
         if (!bairros[celula.bairro]) bairros[celula.bairro] = [];
@@ -262,15 +232,11 @@
       }
     }
 
-    // Criar os botões na página
     criarBotoes(redes, grupoRedes, 'rede');
     criarBotoes(dias, grupoDias, 'dia');
-
-    // Selecionar os padrões visualmente e mostrar dados
     atualizarSelecionados('rede');
     atualizarSelecionados('dia');
     atualizarCelulas();
-
   </script>
 
 </body>
