@@ -72,6 +72,19 @@
       background-color: #ff3333;
       font-weight: bold;
     }
+
+    .voltar {
+      background-color: transparent;
+      border: none;
+      color: #b30000;
+      font-weight: bold;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .voltar:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -86,12 +99,14 @@
 
   <!-- Etapa 2: Escolher Dia -->
   <div class="etapa" id="etapa-dia">
+    <button class="voltar" onclick="mostrarEtapa('rede')">← Voltar para Redes</button>
     <h2>2️⃣ Escolha o Dia da Semana</h2>
     <div class="grupo-botoes" id="grupo-dias"></div>
   </div>
 
   <!-- Etapa 3: Mostrar Células -->
   <div class="etapa" id="etapa-celulas">
+    <button class="voltar" onclick="mostrarEtapa('dia')">← Voltar para Dias</button>
     <h2>📍 Células Disponíveis</h2>
     <div id="celulas-container"></div>
   </div>
@@ -141,7 +156,6 @@
     const etapaDia = document.getElementById('etapa-dia');
     const etapaCelulas = document.getElementById('etapa-celulas');
 
-    // Cria botões para redes
     function criarBotoesRedes() {
       const redes = Object.keys(dadosCelulas);
 
@@ -151,10 +165,8 @@
         btn.textContent = formatarRede(rede);
         btn.addEventListener('click', () => {
           redeSelecionada = rede;
+          grupoRedes.querySelectorAll('.botao').forEach(b => b.classList.remove('selecionado'));
           btn.classList.add('selecionado');
-          grupoRedes.querySelectorAll('.botao').forEach(b => {
-            if (b !== btn) b.classList.remove('selecionado');
-          });
           mostrarEtapa('dia');
           criarBotoesDias(Object.keys(dadosCelulas[rede]));
         });
@@ -162,9 +174,8 @@
       });
     }
 
-    // Cria botões para dias
     function criarBotoesDias(dias) {
-      grupoDias.innerHTML = ''; // limpa
+      grupoDias.innerHTML = '';
 
       dias.forEach(dia => {
         const btn = document.createElement('button');
@@ -172,10 +183,8 @@
         btn.textContent = formatarDia(dia);
         btn.addEventListener('click', () => {
           diaSelecionado = dia;
+          grupoDias.querySelectorAll('.botao').forEach(b => b.classList.remove('selecionado'));
           btn.classList.add('selecionado');
-          grupoDias.querySelectorAll('.botao').forEach(b => {
-            if (b !== btn) b.classList.remove('selecionado');
-          });
           mostrarEtapa('celulas');
           mostrarCelulas();
         });
@@ -222,6 +231,7 @@
       etapaDia.classList.remove('ativa');
       etapaCelulas.classList.remove('ativa');
 
+      if (etapa === 'rede') etapaRede.classList.add('ativa');
       if (etapa === 'dia') etapaDia.classList.add('ativa');
       if (etapa === 'celulas') etapaCelulas.classList.add('ativa');
     }
@@ -235,7 +245,6 @@
       return dia.charAt(0).toUpperCase() + dia.slice(1);
     }
 
-    // Inicializar
     criarBotoesRedes();
   </script>
 
