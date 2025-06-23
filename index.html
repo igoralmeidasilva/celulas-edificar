@@ -1,243 +1,89 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Células - Igreja</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #ffffff;
-      margin-bottom: 120px;
-      color: #000000;
-    }
-    h1, h2 {
-      color: #b30000;
-    }
-    .bairro {
-      margin-bottom: 20px;
-      background-color: #fff0f0;
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 5px solid #b30000;
-    }
-    .celula {
-      margin-bottom: 10px;
-      padding-left: 10px;
-    }
+<!-- Substitua o <style> e o bloco de botões flutuantes pelo abaixo -->
 
-    .botao-flutuante-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      z-index: 1000;
-      font-size: 14px;
-      user-select: none;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #ffffff;
+    margin-bottom: 80px;
+    color: #000000;
+  }
+  h1, h2 {
+    color: #b30000;
+    text-align: center;
+  }
+  .bairro {
+    margin-bottom: 20px;
+    background-color: #fff0f0;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 5px solid #b30000;
+  }
+  .celula {
+    margin-bottom: 10px;
+    padding-left: 10px;
+  }
 
-    .grupo-botoes {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      max-width: 300px;
-      border: 1px solid #b30000;
-    }
+  .seletor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
 
-    .grupo-botoes span {
-      font-weight: bold;
-      margin-right: 8px;
-      white-space: nowrap;
-      align-self: center;
-      color: #b30000;
-    }
+  .grupo-botoes {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #b30000;
+    max-width: 90%;
+  }
 
-    .botao-flutuante {
-      padding: 6px 12px;
-      border: 1px solid #b30000;
-      background-color: #b30000;
-      color: white;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      flex-shrink: 0;
-    }
-    .botao-flutuante:hover {
-      background-color: #800000;
-    }
-    .botao-flutuante.selecionado {
-      background-color: #ff3333;
-      font-weight: bold;
-    }
+  .grupo-botoes span {
+    font-weight: bold;
+    margin-right: 8px;
+    white-space: nowrap;
+    align-self: center;
+    color: #b30000;
+  }
 
-    @media(max-width: 480px) {
-      .botao-flutuante-container {
-        right: 10px;
-        bottom: 10px;
-        max-width: 90vw;
-      }
-      .grupo-botoes {
-        max-width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
-</head>
-<body>
+  .botao-flutuante {
+    padding: 6px 12px;
+    border: 1px solid #b30000;
+    background-color: #b30000;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-  <h1>Células da Igreja</h1>
+  .botao-flutuante:hover {
+    background-color: #800000;
+  }
 
-  <div id="celulas-container"></div>
+  .botao-flutuante.selecionado {
+    background-color: #ff3333;
+    font-weight: bold;
+  }
+</style>
 
-  <div class="botao-flutuante-container">
-    <div class="grupo-botoes" id="grupo-redes">
-      <span>Rede:</span>
-    </div>
-    <div class="grupo-botoes" id="grupo-dias">
-      <span>Dia:</span>
-    </div>
+<!-- Substitua este bloco pelo abaixo no <body> -->
+
+<h1>Células da Igreja</h1>
+
+<div class="seletor-container">
+  <div class="grupo-botoes" id="grupo-redes">
+    <span>Rede:</span>
   </div>
+  <div class="grupo-botoes" id="grupo-dias">
+    <span>Dia:</span>
+  </div>
+</div>
 
-  <script>
-    const dadosCelulas = {
-      rede6: {
-        "quarta-feira": [
-          {
-            bairro: "Jardim das Palmeiras",
-            nome: "Célula Beloved Children",
-            endereco: "Rua do Garçom, 907",
-            horario: "19:30"
-          },
-          {
-            bairro: "Jardim Holanda",
-            nome: "Célula United",
-            endereco: "Rua Alameda José Salvador Silva, 595",
-            horario: "19:30"
-          },
-          {
-            bairro: "Jardim Holanda",
-            nome: "Célula Girls Connected",
-            endereco: "Rua Alameda Emiliano Borges Silva, 201",
-            horario: "19:30"
-          }
-        ],
-        "quinta-feira": [
-          {
-            bairro: "Segismundo Pereira",
-            nome: "Célula Ágape",
-            endereco: "Rua Domingo de Freitas, 1228",
-            horario: "19:30"
-          }
-        ]
-      }
-    };
-
-    const redes = Object.keys(dadosCelulas);
-    const diasSet = new Set();
-    for (const rede of redes) {
-      Object.keys(dadosCelulas[rede]).forEach(dia => diasSet.add(dia));
-    }
-    const dias = Array.from(diasSet).sort();
-
-    let redeSelecionada = redes[0];
-    let diaSelecionado = dias[0];
-
-    const grupoRedes = document.getElementById('grupo-redes');
-    const grupoDias = document.getElementById('grupo-dias');
-    const celulasContainer = document.getElementById('celulas-container');
-
-    function criarBotoes(opcoes, container, tipo) {
-      opcoes.forEach(opcao => {
-        const btn = document.createElement('button');
-        btn.className = 'botao-flutuante';
-        btn.textContent = (tipo === 'rede') ? formatarRede(opcao) : formatarDia(opcao);
-        btn.dataset.valor = opcao;
-
-        btn.addEventListener('click', () => {
-          if (tipo === 'rede') {
-            redeSelecionada = opcao;
-            atualizarSelecionados('rede');
-          } else {
-            diaSelecionado = opcao;
-            atualizarSelecionados('dia');
-          }
-          atualizarCelulas();
-        });
-
-        container.appendChild(btn);
-      });
-    }
-
-    function formatarRede(chave) {
-      if (chave === 'rede6') return 'Rede 6 (Radicais Livres)';
-      return chave;
-    }
-
-    function formatarDia(dia) {
-      return dia.charAt(0).toUpperCase() + dia.slice(1);
-    }
-
-    function atualizarSelecionados(tipo) {
-      const container = tipo === 'rede' ? grupoRedes : grupoDias;
-      const botoes = container.querySelectorAll('button.botao-flutuante');
-
-      botoes.forEach(btn => {
-        if ((tipo === 'rede' && btn.dataset.valor === redeSelecionada) ||
-            (tipo === 'dia' && btn.dataset.valor === diaSelecionado)) {
-          btn.classList.add('selecionado');
-        } else {
-          btn.classList.remove('selecionado');
-        }
-      });
-    }
-
-    function atualizarCelulas() {
-      celulasContainer.innerHTML = '';
-      const celulas = dadosCelulas[redeSelecionada]?.[diaSelecionado] || [];
-
-      if (celulas.length === 0) {
-        celulasContainer.innerHTML = '<p>Nenhuma célula encontrada para essa seleção.</p>';
-        return;
-      }
-
-      const bairros = {};
-      celulas.forEach(celula => {
-        if (!bairros[celula.bairro]) bairros[celula.bairro] = [];
-        bairros[celula.bairro].push(celula);
-      });
-
-      for (const bairro in bairros) {
-        const divBairro = document.createElement('div');
-        divBairro.className = 'bairro';
-
-        const h2 = document.createElement('h2');
-        h2.textContent = `📍 Bairro ${bairro}`;
-        divBairro.appendChild(h2);
-
-        bairros[bairro].forEach(celula => {
-          const divCelula = document.createElement('div');
-          divCelula.className = 'celula';
-          divCelula.innerHTML = `<strong>${celula.nome}</strong><br>🕒 ${diaSelecionado} - ${celula.horario}<br>📍 ${celula.endereco}`;
-          divBairro.appendChild(divCelula);
-        });
-
-        celulasContainer.appendChild(divBairro);
-      }
-    }
-
-    criarBotoes(redes, grupoRedes, 'rede');
-    criarBotoes(dias, grupoDias, 'dia');
-    atualizarSelecionados('rede');
-    atualizarSelecionados('dia');
-    atualizarCelulas();
-  </script>
-
-</body>
-</html>
+<div id="celulas-container"></div>
