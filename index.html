@@ -218,13 +218,13 @@
         divBairro.className = 'bairro';
 
         const h2 = document.createElement('h2');
-        h2.textContent = 📍 Bairro ${bairro};
+        h2.textContent = `📍 Bairro ${bairro}`;
         divBairro.appendChild(h2);
 
         bairros[bairro].forEach(celula => {
           const divCelula = document.createElement('div');
           divCelula.className = 'celula';
-          divCelula.innerHTML = <strong>${celula.nome}</strong><br>🕒 ${diaSelecionado} - ${celula.horario}<br>📍 ${celula.endereco};
+          divCelula.innerHTML = `<strong>${celula.nome}</strong><br>🕒 ${diaSelecionado} - ${celula.horario}<br>📍 ${celula.endereco}`;
           divBairro.appendChild(divCelula);
         });
 
