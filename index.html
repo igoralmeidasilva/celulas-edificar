@@ -9,6 +9,7 @@
       font-family: Arial, sans-serif;
       padding: 20px;
       background-color: #ffffff;
+      margin-bottom: 120px;
       color: #000000;
     }
     h1, h2 {
@@ -26,13 +27,16 @@
       padding-left: 10px;
     }
 
-    .etapa {
-      display: none;
-      margin-bottom: 20px;
-    }
-
-    .etapa.ativa {
-      display: block;
+    .botao-flutuante-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 1000;
+      font-size: 14px;
+      user-select: none;
     }
 
     .grupo-botoes {
@@ -41,74 +45,64 @@
       padding: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
+      max-width: 300px;
       border: 1px solid #b30000;
-      margin-bottom: 20px;
     }
 
     .grupo-botoes span {
       font-weight: bold;
       margin-right: 8px;
-      color: #b30000;
+      white-space: nowrap;
       align-self: center;
+      color: #b30000;
     }
 
-    .botao {
-      padding: 8px 16px;
+    .botao-flutuante {
+      padding: 6px 12px;
       border: 1px solid #b30000;
       background-color: #b30000;
       color: white;
       border-radius: 20px;
       cursor: pointer;
       transition: background-color 0.3s;
+      flex-shrink: 0;
     }
-
-    .botao:hover {
+    .botao-flutuante:hover {
       background-color: #800000;
     }
-
-    .botao.selecionado {
+    .botao-flutuante.selecionado {
       background-color: #ff3333;
       font-weight: bold;
     }
 
-    .voltar {
-      background-color: transparent;
-      border: none;
-      color: #b30000;
-      font-weight: bold;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .voltar:hover {
-      text-decoration: underline;
+    @media(max-width: 480px) {
+      .botao-flutuante-container {
+        right: 10px;
+        bottom: 10px;
+        max-width: 90vw;
+      }
+      .grupo-botoes {
+        max-width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>Encontre sua Célula</h1>
+  <h1>Células da Igreja</h1>
 
-  <!-- Etapa 1: Escolher Rede -->
-  <div class="etapa ativa" id="etapa-rede">
-    <h2>1️⃣ Escolha a Rede</h2>
-    <div class="grupo-botoes" id="grupo-redes"></div>
-  </div>
+  <div id="celulas-container"></div>
 
-  <!-- Etapa 2: Escolher Dia -->
-  <div class="etapa" id="etapa-dia">
-    <button class="voltar" onclick="mostrarEtapa('rede')">← Voltar para Redes</button>
-    <h2>2️⃣ Escolha o Dia da Semana</h2>
-    <div class="grupo-botoes" id="grupo-dias"></div>
-  </div>
-
-  <!-- Etapa 3: Mostrar Células -->
-  <div class="etapa" id="etapa-celulas">
-    <button class="voltar" onclick="mostrarEtapa('dia')">← Voltar para Dias</button>
-    <h2>📍 Células Disponíveis</h2>
-    <div id="celulas-container"></div>
+  <div class="botao-flutuante-container">
+    <div class="grupo-botoes" id="grupo-redes">
+      <span>Rede:</span>
+    </div>
+    <div class="grupo-botoes" id="grupo-dias">
+      <span>Dia:</span>
+    </div>
   </div>
 
   <script>
@@ -145,54 +139,66 @@
       }
     };
 
-    let redeSelecionada = null;
-    let diaSelecionado = null;
+    const redes = Object.keys(dadosCelulas);
+    const diasSet = new Set();
+    for (const rede of redes) {
+      Object.keys(dadosCelulas[rede]).forEach(dia => diasSet.add(dia));
+    }
+    const dias = Array.from(diasSet).sort();
+
+    let redeSelecionada = redes[0];
+    let diaSelecionado = dias[0];
 
     const grupoRedes = document.getElementById('grupo-redes');
     const grupoDias = document.getElementById('grupo-dias');
     const celulasContainer = document.getElementById('celulas-container');
 
-    const etapaRede = document.getElementById('etapa-rede');
-    const etapaDia = document.getElementById('etapa-dia');
-    const etapaCelulas = document.getElementById('etapa-celulas');
-
-    function criarBotoesRedes() {
-      const redes = Object.keys(dadosCelulas);
-
-      redes.forEach(rede => {
+    function criarBotoes(opcoes, container, tipo) {
+      opcoes.forEach(opcao => {
         const btn = document.createElement('button');
-        btn.className = 'botao';
-        btn.textContent = formatarRede(rede);
+        btn.className = 'botao-flutuante';
+        btn.textContent = (tipo === 'rede') ? formatarRede(opcao) : formatarDia(opcao);
+        btn.dataset.valor = opcao;
+
         btn.addEventListener('click', () => {
-          redeSelecionada = rede;
-          grupoRedes.querySelectorAll('.botao').forEach(b => b.classList.remove('selecionado'));
-          btn.classList.add('selecionado');
-          mostrarEtapa('dia');
-          criarBotoesDias(Object.keys(dadosCelulas[rede]));
+          if (tipo === 'rede') {
+            redeSelecionada = opcao;
+            atualizarSelecionados('rede');
+          } else {
+            diaSelecionado = opcao;
+            atualizarSelecionados('dia');
+          }
+          atualizarCelulas();
         });
-        grupoRedes.appendChild(btn);
+
+        container.appendChild(btn);
       });
     }
 
-    function criarBotoesDias(dias) {
-      grupoDias.innerHTML = '';
+    function formatarRede(chave) {
+      if (chave === 'rede6') return 'Rede 6 (Radicais Livres)';
+      return chave;
+    }
 
-      dias.forEach(dia => {
-        const btn = document.createElement('button');
-        btn.className = 'botao';
-        btn.textContent = formatarDia(dia);
-        btn.addEventListener('click', () => {
-          diaSelecionado = dia;
-          grupoDias.querySelectorAll('.botao').forEach(b => b.classList.remove('selecionado'));
+    function formatarDia(dia) {
+      return dia.charAt(0).toUpperCase() + dia.slice(1);
+    }
+
+    function atualizarSelecionados(tipo) {
+      const container = tipo === 'rede' ? grupoRedes : grupoDias;
+      const botoes = container.querySelectorAll('button.botao-flutuante');
+
+      botoes.forEach(btn => {
+        if ((tipo === 'rede' && btn.dataset.valor === redeSelecionada) ||
+            (tipo === 'dia' && btn.dataset.valor === diaSelecionado)) {
           btn.classList.add('selecionado');
-          mostrarEtapa('celulas');
-          mostrarCelulas();
-        });
-        grupoDias.appendChild(btn);
+        } else {
+          btn.classList.remove('selecionado');
+        }
       });
     }
 
-    function mostrarCelulas() {
+    function atualizarCelulas() {
       celulasContainer.innerHTML = '';
       const celulas = dadosCelulas[redeSelecionada]?.[diaSelecionado] || [];
 
@@ -226,26 +232,11 @@
       }
     }
 
-    function mostrarEtapa(etapa) {
-      etapaRede.classList.remove('ativa');
-      etapaDia.classList.remove('ativa');
-      etapaCelulas.classList.remove('ativa');
-
-      if (etapa === 'rede') etapaRede.classList.add('ativa');
-      if (etapa === 'dia') etapaDia.classList.add('ativa');
-      if (etapa === 'celulas') etapaCelulas.classList.add('ativa');
-    }
-
-    function formatarRede(chave) {
-      if (chave === 'rede6') return 'Rede 6 (Radicais Livres)';
-      return chave;
-    }
-
-    function formatarDia(dia) {
-      return dia.charAt(0).toUpperCase() + dia.slice(1);
-    }
-
-    criarBotoesRedes();
+    criarBotoes(redes, grupoRedes, 'rede');
+    criarBotoes(dias, grupoDias, 'dia');
+    atualizarSelecionados('rede');
+    atualizarSelecionados('dia');
+    atualizarCelulas();
   </script>
 
 </body>
